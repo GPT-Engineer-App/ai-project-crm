@@ -1,0 +1,64 @@
+import { useState } from "react";
+import { Box, Flex, Heading, Input, Button, Select, Text, VStack } from "@chakra-ui/react";
+import { FaPlus, FaArrowUp, FaArrowDown } from "react-icons/fa";
+
+const Index = () => {
+  const [projects, setProjects] = useState([]);
+  const [newProject, setNewProject] = useState("");
+  const [newPriority, setNewPriority] = useState("medium");
+
+  const addProject = () => {
+    if (newProject.trim() !== "") {
+      setProjects([...projects, { name: newProject, priority: newPriority, id: Date.now() }]);
+      setNewProject("");
+    }
+  };
+
+  const changePriority = (id, direction) => {
+    const updatedProjects = projects.map((project) => {
+      if (project.id === id) {
+        const priorities = ["low", "medium", "high"];
+        const currentIndex = priorities.indexOf(project.priority);
+        const newIndex = direction === "up" ? Math.max(currentIndex - 1, 0) : Math.min(currentIndex + 1, priorities.length - 1);
+        return { ...project, priority: priorities[newIndex] };
+      }
+      return project;
+    });
+    setProjects(updatedProjects);
+  };
+
+  return (
+    <Box p={8}>
+      <Heading mb={4}>CRM for AI Projects</Heading>
+      <Flex mb={4}>
+        <Input placeholder="Add a new project" value={newProject} onChange={(e) => setNewProject(e.target.value)} mr={2} />
+        <Select value={newPriority} onChange={(e) => setNewPriority(e.target.value)} mr={2}>
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </Select>
+        <Button onClick={addProject}>
+          <FaPlus />
+        </Button>
+      </Flex>
+      <VStack align="start" spacing={4}>
+        {projects.map((project) => (
+          <Flex key={project.id} justify="space-between" align="center" w="full" p={4} borderWidth={1} borderRadius={8}>
+            <Text>{project.name}</Text>
+            <Flex align="center">
+              <Text mr={2}>{project.priority}</Text>
+              <Button size="sm" onClick={() => changePriority(project.id, "up")} mr={2}>
+                <FaArrowUp />
+              </Button>
+              <Button size="sm" onClick={() => changePriority(project.id, "down")}>
+                <FaArrowDown />
+              </Button>
+            </Flex>
+          </Flex>
+        ))}
+      </VStack>
+    </Box>
+  );
+};
+
+export default Index;
